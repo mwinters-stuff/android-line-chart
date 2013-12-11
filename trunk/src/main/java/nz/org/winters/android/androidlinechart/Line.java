@@ -61,6 +61,11 @@ public class Line<XT, YT>
     points.add(point);
   }
 
+  public void addPoint(XT x, YT y)
+  {
+    addPoint(new LinePoint<XT, YT>(x, y));
+  }
+
   public LinePoint<XT, YT> getPoint(int index)
   {
     return points.get(index);
@@ -200,6 +205,18 @@ public class Line<XT, YT>
     return point == null ? 0 : point.getYAxisLabelHeight();
   }
 
+  public float getMaxPointY()
+  {
+    LinePoint point = Collections.max(points, new Comparator<LinePoint>()
+    {
+      @Override
+      public int compare(LinePoint lhs, LinePoint rhs)
+      {
+        return Float.compare(lhs.getPointY(), rhs.getPointY());
+      }
+    });
+    return point == null ? 0 : point.getPointY();
+  }
 
   @Override
   public String toString()

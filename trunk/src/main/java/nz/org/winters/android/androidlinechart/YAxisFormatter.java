@@ -6,9 +6,8 @@ package nz.org.winters.android.androidlinechart;
 public interface YAxisFormatter<YT>
 {
   public String format(YT value);
-
   public String format(Float value);
-
   public float toFloat(YT value);
 
+  public float roundAxisValue(float value);
 }
