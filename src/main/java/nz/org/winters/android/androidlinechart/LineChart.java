@@ -48,13 +48,15 @@ public class LineChart<XT, YT> extends View
   private XAxisFormatter<XT> mXAxisFormatter = null;
   private YAxisFormatter<YT> mYAxisFormatter = null;
 
-  private float   mMinY          = Float.MAX_VALUE;//, mMinX = 0;
-  private float   mMaxY          = Float.MIN_VALUE;//, mMaxX = 0;
-  private float   mMinX          = Float.MAX_VALUE;//, mMinX = 0;
-  private float   mMaxX          = Float.MIN_VALUE;//, mMaxX = 0;
-  private boolean mIsMaxYUserSet = false;
-  private int     mLineToFill    = -1;
-  private int     mIndexSelected = -1;
+  private float   mMinY           = Float.MAX_VALUE;//, mMinX = 0;
+  private float   mMaxY           = Float.MIN_VALUE;//, mMaxX = 0;
+  private float   mMinX           = Float.MAX_VALUE;//, mMinX = 0;
+  private float   mMaxX           = Float.MIN_VALUE;//, mMaxX = 0;
+  private float   mMaxYNoRounding = Float.MIN_VALUE;
+  private float   mMinYNoRounding = Float.MAX_VALUE;
+  private boolean mIsMaxYUserSet  = false;
+  private int     mLineToFill     = -1;
+  private int     mIndexSelected  = -1;
   private OnPointClickedListener mListener;
   private Bitmap                 mFullImage;
 
@@ -155,7 +157,7 @@ public class LineChart<XT, YT> extends View
     mDotPaint.setStyle(Paint.Style.FILL_AND_STROKE);
     mDotPaint.setStrokeWidth(2.0F * mDensity);
     mDotShadowPaint.setStyle(Paint.Style.FILL);
-    mDotShadowPaint.setColor(getResources().getColor(17170447));
+    mDotShadowPaint.setColor(getResources().getColor(R.color.shadow_color));
     mGridPaint.setColor(mResources.getColor(R.color.grid_color));
     mGridPaint.setStrokeWidth(0.5F * mDensity);
     mBrightGridPaint.setColor(mResources.getColor(R.color.light_grid_color));
@@ -184,14 +186,18 @@ public class LineChart<XT, YT> extends View
 
   private void resetMaxMin()
   {
-    mMinY = Float.MAX_VALUE;//, mMinX = 0;
-    mMaxY = Float.MIN_VALUE;//, mMaxX = 0;
-    mMinX = Float.MAX_VALUE;//, mMinX = 0;
-    mMaxX = Float.MIN_VALUE;//, mMaxX = 0;
-
+    if (!mIsMaxYUserSet)
+    {
+      mMinY = Float.MAX_VALUE;//, mMinX = 0;
+      mMaxY = Float.MIN_VALUE;//, mMaxX = 0;
+      mMinX = Float.MAX_VALUE;//, mMinX = 0;
+      mMaxX = Float.MIN_VALUE;//, mMaxX = 0;
+      mMaxYNoRounding = Float.MIN_VALUE;
+      mMinYNoRounding = Float.MAX_VALUE;//, mMinX = 0;
+    }
   }
 
-  public void addLine(Line line)
+  public void addLine(Line<XT, YT> line)
   {
     mLines.add(line);
   }
@@ -236,9 +242,64 @@ public class LineChart<XT, YT> extends View
 
   public void setRangeY(float min, float max)
   {
-    mMinY = min;
-    mMaxY = max;
+    float xMinY = min;
+    float xMaxY = max;
+    mMaxYNoRounding = max;
+
+    if (xMaxY % 10 != 0)
+    {
+      xMaxY = (((int) xMaxY / 10) * 10) + 10;
+    }
+
+    if (xMinY % 10 != 0)
+    {
+      xMinY = (((int) xMinY / 10) * 10) - 10;
+    }
+
+    mMaxY = xMaxY + ((xMaxY + xMinY) / mYAxisLabels);
+
+    if (xMinY != 0)
+    {
+      mMinY = xMinY - ((xMaxY + xMinY) / mYAxisLabels);
+    } else
+    {
+      mMinY = 0;
+    }
+
     mIsMaxYUserSet = true;
+  }
+
+  public float getMaxYNoRounding()
+  {
+    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxYNoRounding == Float.MIN_VALUE))
+    {
+      mMaxYNoRounding = Collections.max(mLines, new Comparator<Line>()
+      {
+        @Override
+        public int compare(Line lhs, Line rhs)
+        {
+          return Float.compare(lhs.getMaxY(), rhs.getMaxY());
+        }
+      }).getMaxY();
+    }
+    return mMaxYNoRounding == Float.MIN_VALUE ? 0 : mMaxYNoRounding;
+  }
+
+
+  public float getMinYNoRounding()
+  {
+    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinYNoRounding == Float.MAX_VALUE))
+    {
+      mMinYNoRounding = Collections.max(mLines, new Comparator<Line>()
+      {
+        @Override
+        public int compare(Line lhs, Line rhs)
+        {
+          return Float.compare(lhs.getMaxY(), rhs.getMaxY());
+        }
+      }).getMaxY();
+    }
+    return mMaxYNoRounding == Float.MIN_VALUE ? 0 : mMinYNoRounding;
   }
 
   public float getMaxY()
@@ -254,7 +315,10 @@ public class LineChart<XT, YT> extends View
         }
       }).getMaxY();
       // round up to nearist 10..
-      mMaxY = (((int) mMaxY / 10) * 10) + 10;
+      if (mMaxY % 10 != 0)
+      {
+        mMaxY = (((int) mMaxY / 10) * 10) + 10;
+      }
       mMaxY = mMaxY + (mMaxY / mYAxisLabels);
     }
     return mMaxY == Float.MIN_VALUE ? 0 : mMaxY;
@@ -274,7 +338,11 @@ public class LineChart<XT, YT> extends View
       }).getMinY();
 
       // round minY down to nearist 10..
-      mMinY = ((int) mMinY / 10) * 10;
+      if (mMinY % 10 != 0)
+      {
+        mMinY = (((int) mMinY / 10) * 10) - 10;
+      }
+      mMinY = mMinY - (mMinY / mYAxisLabels);
 
     }
     return mMinY == Float.MAX_VALUE ? 0 : mMinY;
@@ -395,20 +463,15 @@ public class LineChart<XT, YT> extends View
       float usableHeight = getHeight() - bottomPadding - topPadding;
       float usableWidth = getWidth() - leftPadding - rightPadding;
 
-      float maxY = getMaxY();
-      float minY = getMinY();
-      float maxX = getMaxX();
-      float minX = getMinX();
-
-      calculatePoints(bottomPadding, leftPadding, usableHeight, usableWidth, maxY, minY, maxX, minX);
+      calculatePoints(bottomPadding, leftPadding, usableHeight, usableWidth);
 
 
       drawLines(topPadding, leftPadding, usableHeight, usableWidth);
 
       drawDots(topPadding, leftPadding, usableHeight, usableWidth);
 
-      drawYAxisLabels(bottomPadding, topPadding, leftPadding, usableHeight, maxY, minY);
-      drawXAxis(bottomPadding, leftPadding, rightPadding, usableWidth, maxX, minX);
+      drawYAxisLabels(bottomPadding, topPadding, leftPadding, usableHeight);
+      drawXAxis(bottomPadding, leftPadding, rightPadding, usableWidth);
 
       mShouldUpdate = false;
     }
@@ -471,7 +534,7 @@ public class LineChart<XT, YT> extends View
           pointCount++;
         }
       }
-    }
+      }
 //    } finally
 //    {
 //      mCanvas.restore();
@@ -507,14 +570,14 @@ public class LineChart<XT, YT> extends View
         }
         mCanvas.drawPath(mPath, mChartPaint);
       }
-    }
+      }
 //    } finally
 //    {
 //      mCanvas.restore();
 //    }
   }
 
-  private void drawXAxis(float bottomPadding, float leftPadding, float rightPadding, float usableWidth, float maxX, float minX)
+  private void drawXAxis(float bottomPadding, float leftPadding, float rightPadding, float usableWidth)
   {
     mCanvas.drawLine(leftPadding, getHeight() - bottomPadding, getWidth() - rightPadding, getHeight() - bottomPadding, mGridPaint);
     if (mXLabels.size() > 0)
@@ -577,14 +640,13 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawYAxisLabels(float bottomPadding, float topPadding, float leftPadding, float usableHeight, float maxY, float minY)
+  private void drawYAxisLabels(float bottomPadding, float topPadding, float leftPadding, float usableHeight)
   {
-    // draw y axis
-    //mCanvas.drawLine(this.mDensity, getHeight() - bottomPadding, getWidth() - this.mDensity, this.mHeight - paramFloat, this.mGridPaint);
-    //mCanvas.drawLine(leftPadding, getHeight() - bottomPadding, leftPadding, topPadding, mGridPaint);
     int count = 0;
-////					float lastXPixels = 0, newYPixels = 0;
-////					float lastYPixels = 0, newXPixels = 0; 
+
+    float maxY = getMaxY();
+    float minY = getMinY();
+
     int textHeight = (int) getTextHeightY();
     int yStep = mYAxisLabels + 1;
     while (textHeight * yStep > usableHeight)
@@ -592,32 +654,47 @@ public class LineChart<XT, YT> extends View
       yStep -= 5;
     }
 
-    float step = (maxY - minY) / yStep;
+    float rawMaxY = (getMaxYNoRounding());
+    if ((getMaxYNoRounding()) % 10 != 0)
+    {
+      rawMaxY = (((int) (getMaxYNoRounding()) / 10) * 10) + 10;
+    }
+
+    float rawMinY = (getMinYNoRounding());
+    if ((getMinYNoRounding()) % 10 != 0)
+    {
+      rawMaxY = (((int) (getMinYNoRounding()) / 10) * 10) - 10;
+    }
+
+    float step = rawMaxY / (yStep - 1);
     float value = minY;
-    float ystep = usableHeight / yStep;
+
     for (int i = 0; i <= yStep - 1; i++)
     {
-      float y = (getHeight() - bottomPadding) - (ystep * i);
+      float yPercent = ((int) (mYAxisFormatter.roundAxisValue(value - minY))) / (maxY - minY);
+      float y = getHeight() - bottomPadding - (usableHeight * yPercent);
+
       mCanvas.drawLine(this.mDensity, y, getWidth() - this.mDensity, y, this.mGridPaint);
 
-      //mCanvas.drawLine(leftPadding, y, leftPadding - 5, y, mGridPaint);
-      //mCanvas.drawLine(leftPadding, y, usableWidth, y, mPaint);
-
       String str = mYAxisFormatter.format(value);
-//      String str = Integer.toString((int) value);
-      //mLabelPaintLeft.getTextBounds(str, 0, str.length(), mRect);
-      float tx = mDensity;// + mRect.width();
-      float ty = y - mDensity;//- mRect.height();
-//
+
+      float tx = mDensity;
+      float ty = y - mDensity;
+
       mCanvas.drawText(str, tx, ty, mLabelPaintLeft);
 
       value += step;
     }
   }
 
-  private void calculatePoints(float bottomPadding, float leftPadding, float usableHeight, float usableWidth, float maxY, float minY, float maxX, float minX)
+  private void calculatePoints(float bottomPadding, float leftPadding, float usableHeight, float usableWidth)
   {
     mXLabels.clear();
+    float maxY = getMaxY();
+    float minY = getMinY();
+    float maxX = getMaxX();
+    float minX = getMinX();
+
     // calculate points.
     for (Line<XT, YT> line : mLines)
     {
