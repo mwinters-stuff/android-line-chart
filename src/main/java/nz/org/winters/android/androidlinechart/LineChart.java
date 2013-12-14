@@ -242,30 +242,17 @@ public class LineChart<XT, YT> extends View
 
   public void setRangeY(float min, float max)
   {
-    float xMinY = min;
-    float xMaxY = max;
-    mMaxYNoRounding = max;
-
-    if (xMaxY % 10 != 0)
-    {
-      xMaxY = (((int) xMaxY / 10) * 10) + 10;
-    }
-
-    if (xMinY % 10 != 0)
-    {
-      xMinY = (((int) xMinY / 10) * 10) - 10;
-    }
+    float xMinY = roundDown(min);
+    float xMaxY = roundUp(max);
 
     mMaxY = xMaxY + ((xMaxY + xMinY) / mYAxisLabels);
 
     if (xMinY != 0)
     {
       mMinY = xMinY - ((xMaxY + xMinY) / mYAxisLabels);
-    } else
-    {
-      mMinY = 0;
     }
 
+    mMaxYNoRounding = max;
     mIsMaxYUserSet = true;
   }
 
@@ -290,20 +277,21 @@ public class LineChart<XT, YT> extends View
   {
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinYNoRounding == Float.MAX_VALUE))
     {
-      mMinYNoRounding = Collections.max(mLines, new Comparator<Line>()
+      mMinYNoRounding = Collections.min(mLines, new Comparator<Line>()
       {
         @Override
         public int compare(Line lhs, Line rhs)
         {
-          return Float.compare(lhs.getMaxY(), rhs.getMaxY());
+          return Float.compare(lhs.getMinY(), rhs.getMinY());
         }
-      }).getMaxY();
+      }).getMinY();
     }
-    return mMaxYNoRounding == Float.MIN_VALUE ? 0 : mMinYNoRounding;
+    return mMinYNoRounding == Float.MIN_VALUE ? 0 : mMinYNoRounding;
   }
 
   public float getMaxY()
   {
+    float miny = getMinY(); // ensures calculated first
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxY == Float.MIN_VALUE))
     {
       mMaxY = Collections.max(mLines, new Comparator<Line>()
@@ -315,11 +303,10 @@ public class LineChart<XT, YT> extends View
         }
       }).getMaxY();
       // round up to nearist 10..
-      if (mMaxY % 10 != 0)
-      {
-        mMaxY = (((int) mMaxY / 10) * 10) + 10;
-      }
-      mMaxY = mMaxY + (mMaxY / mYAxisLabels);
+      mMaxY = roundUp(mMaxY);
+      mMaxY = mMaxY + ((mMaxY - miny) / mYAxisLabels);
+
+
     }
     return mMaxY == Float.MIN_VALUE ? 0 : mMaxY;
   }
@@ -338,12 +325,11 @@ public class LineChart<XT, YT> extends View
       }).getMinY();
 
       // round minY down to nearist 10..
-      if (mMinY % 10 != 0)
-      {
-        mMinY = (((int) mMinY / 10) * 10) - 10;
-      }
-      mMinY = mMinY - (mMinY / mYAxisLabels);
-
+      mMinY = roundDown(mMinY);
+//      if (mMinY != 0)
+//      {
+//        mMinY = mMinY - ((mMaxY + mMinY) / mYAxisLabels);
+//      }
     }
     return mMinY == Float.MAX_VALUE ? 0 : mMinY;
   }
@@ -640,6 +626,34 @@ public class LineChart<XT, YT> extends View
     }
   }
 
+  private float roundDown(float value)
+  {
+    if(value % 10 != 0)
+    {
+      float value2 = ((int)value / 10) * 10;
+      if(value2 != 0)
+      {
+        return value2 - 10;
+      }
+      return value2;
+    }
+    return value;
+  }
+
+  private float roundUp(float value)
+  {
+    if(value % 10 != 0)
+    {
+      float value2 = ((int)value / 10) * 10;
+      if(value2 != 0)
+      {
+        return value2 + 10;
+      }
+      return value2;
+    }
+    return value;
+  }
+
   private void drawYAxisLabels(float bottomPadding, float topPadding, float leftPadding, float usableHeight)
   {
     int count = 0;
@@ -654,19 +668,11 @@ public class LineChart<XT, YT> extends View
       yStep -= 5;
     }
 
-    float rawMaxY = (getMaxYNoRounding());
-    if ((getMaxYNoRounding()) % 10 != 0)
-    {
-      rawMaxY = (((int) (getMaxYNoRounding()) / 10) * 10) + 10;
-    }
+    float rawMaxY = getMaxYNoRounding();
+    float rawMinY = getMinYNoRounding();
 
-    float rawMinY = (getMinYNoRounding());
-    if ((getMinYNoRounding()) % 10 != 0)
-    {
-      rawMaxY = (((int) (getMinYNoRounding()) / 10) * 10) - 10;
-    }
-
-    float step = rawMaxY / (yStep - 1);
+//    float step = (rawMaxY - rawMinY) / (yStep - 1);
+    float step = (maxY - minY) / (yStep - 1);
     float value = minY;
 
     for (int i = 0; i <= yStep - 1; i++)
