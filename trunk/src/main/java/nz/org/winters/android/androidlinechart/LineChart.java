@@ -520,7 +520,7 @@ public class LineChart<XT, YT> extends View
           pointCount++;
         }
       }
-      }
+    }
 //    } finally
 //    {
 //      mCanvas.restore();
@@ -536,7 +536,7 @@ public class LineChart<XT, YT> extends View
 //      mCanvas.clipRect(mRect);
     for (Line<XT, YT> line : mLines)
     {
-      if (line.getSize() > 0)
+      if (line.getSize() > 1)
       {
         int count = 0;
 
@@ -555,8 +555,14 @@ public class LineChart<XT, YT> extends View
           count++;
         }
         mCanvas.drawPath(mPath, mChartPaint);
+      }else if(line.getSize() == 1)
+      {
+        LinePoint<XT, YT> p = line.getPoint(0);
+        mChartPaint.setColor(line.getColor());
+        mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius + 1.0F * mDensity, mDotPaint);
+        mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius, mDotShadowPaint);
       }
-      }
+    }
 //    } finally
 //    {
 //      mCanvas.restore();
@@ -628,10 +634,10 @@ public class LineChart<XT, YT> extends View
 
   private float roundDown(float value)
   {
-    if(value % 10 != 0)
+    if (value % 10 != 0)
     {
-      float value2 = ((int)value / 10) * 10;
-      if(value2 != 0)
+      float value2 = ((int) value / 10) * 10;
+      if (value2 != 0)
       {
         return value2 - 10;
       }
@@ -642,10 +648,10 @@ public class LineChart<XT, YT> extends View
 
   private float roundUp(float value)
   {
-    if(value % 10 != 0)
+    if (value % 10 != 0)
     {
-      float value2 = ((int)value / 10) * 10;
-      if(value2 != 0)
+      float value2 = ((int) value / 10) * 10;
+      if (value2 != 0)
       {
         return value2 + 10;
       }
@@ -706,6 +712,7 @@ public class LineChart<XT, YT> extends View
     {
       if (line.getSize() > 0)
       {
+
         int count = 0;
         for (LinePoint<XT, YT> p : line.getPoints())
         {
