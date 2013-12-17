@@ -128,38 +128,28 @@ public class Line<XT, YT>
 
   public float getMinY()
   {
-    LinePoint point = Collections.min(points, new Comparator<LinePoint>()
+    float min= Float.MAX_VALUE;
+    for(LinePoint point: points)
     {
-      @Override
-      public int compare(LinePoint lhs, LinePoint rhs)
+      if(!point.isYNull())
       {
-				if(lhs.isYNull() || rhs.isYNull())
-				{
-					return 0;
-				}
-        return Float.compare(lhs.getY(), rhs.getY());
+        min = Math.min(min,point.getY());
       }
-
-    });
-    return point == null ? 0 : point.getY();
+    }
+    return min == Float.MAX_VALUE ? 0 : min;
   }
 
   public float getMaxY()
   {
-    LinePoint point = Collections.max(points, new Comparator<LinePoint>()
+    float max= Float.MIN_VALUE;
+    for(LinePoint point: points)
     {
-      @Override
-      public int compare(LinePoint lhs, LinePoint rhs)
+      if(!point.isYNull())
       {
-				if(lhs.isYNull() || rhs.isYNull())
-				{
-					return 0;
-				}
-        return Float.compare(lhs.getY(), rhs.getY());
+        max = Math.max(max,point.getY());
       }
-
-    });
-    return point == null ? 0 : point.getY();
+    }
+    return max == Float.MIN_VALUE ? 0 : max;
   }
 
   public float getMaxTextWidthX()
@@ -177,19 +167,15 @@ public class Line<XT, YT>
 
   public float getMaxTextWidthY()
   {
-    LinePoint point = Collections.max(points, new Comparator<LinePoint>()
+    float max= Float.MIN_VALUE;
+    for(LinePoint point: points)
     {
-      @Override
-      public int compare(LinePoint lhs, LinePoint rhs)
+      if(!point.isYNull())
       {
-				if(lhs.isYNull() || rhs.isYNull())
-				{
-					return 0;
-				}
-        return Float.compare(lhs.getYAxisLabelWidth(), rhs.getYAxisLabelWidth());
+        max = Math.max(max,point.getYAxisLabelWidth());
       }
-    });
-    return point == null ? 0 : point.getYAxisLabelWidth();
+    }
+    return max == Float.MIN_VALUE ? 0 : max;
   }
 
   public float getMaxTextHeightX()
@@ -207,36 +193,28 @@ public class Line<XT, YT>
 
   public float getMaxTextHeightY()
   {
-    LinePoint point = Collections.max(points, new Comparator<LinePoint>()
+    float max= Float.MIN_VALUE;
+    for(LinePoint point: points)
     {
-      @Override
-      public int compare(LinePoint lhs, LinePoint rhs)
+      if(!point.isYNull())
       {
-				if(lhs.isYNull() || rhs.isYNull())
-				{
-					return 0;
-				}
-        return Float.compare(lhs.getYAxisLabelHeight(), rhs.getYAxisLabelHeight());
+        max = Math.max(max,point.getYAxisLabelHeight());
       }
-    });
-    return point == null ? 0 : point.getYAxisLabelHeight();
+    }
+    return max == Float.MIN_VALUE ? 0 : max;
   }
 
   public float getMaxPointY()
   {
-    LinePoint point = Collections.max(points, new Comparator<LinePoint>()
+    float max= Float.MIN_VALUE;
+    for(LinePoint point: points)
     {
-      @Override
-      public int compare(LinePoint lhs, LinePoint rhs)
+      if(!point.isYNull())
       {
-				if(lhs.isYNull() || rhs.isYNull())
-				{
-					return 0;
-				}
-        return Float.compare(lhs.getPointY(), rhs.getPointY());
+        max = Math.max(max,point.getPointY());
       }
-    });
-    return point == null ? 0 : point.getPointY();
+    }
+    return max == Float.MIN_VALUE ? 0 : max;
   }
 
   @Override
