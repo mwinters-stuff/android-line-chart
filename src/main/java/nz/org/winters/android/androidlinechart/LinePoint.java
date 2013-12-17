@@ -36,8 +36,8 @@ public class LinePoint<XT, YT>
   private YT yValue;
   private float x = 0;
   private float y = 0;
-  private Path   path;
-  private Region region;
+  private Path   path = new Path();
+  private Region region = new Region();
   private String xAxisLabel = "";
   private String yAxisLabel = "";
 
@@ -109,7 +109,7 @@ public class LinePoint<XT, YT>
 
   public void setRegion(Region region)
   {
-    this.region = region;
+    this.region.set(region);
   }
 
   public Path getPath()
@@ -119,7 +119,7 @@ public class LinePoint<XT, YT>
 
   public void setPath(Path path)
   {
-    this.path = path;
+    this.path.set(path);
   }
 
   public String getXAxisLabel()
