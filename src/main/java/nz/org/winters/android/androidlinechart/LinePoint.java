@@ -56,7 +56,16 @@ public class LinePoint<XT, YT>
     this.yValue = yValue;
   }
 
+	public LinePoint(int xvalue)
+	{
+		this.xValue = (XT)Integer.valueOf(xvalue);
+		this.yValue = null;
+	}
 
+	public boolean isYNull()
+	{
+		return this.yValue == null;
+	}
   public float getX()
   {
     return x;
@@ -189,19 +198,20 @@ public class LinePoint<XT, YT>
 
   public void format(XAxisFormatter<XT> xAxisFormatter, YAxisFormatter<YT> yAxisFormatter, Paint labelPaint)
   {
+		Rect rect = new Rect();
     x = xAxisFormatter.toFloat(xValue);
-    y = yAxisFormatter.toFloat(yValue);
     xAxisLabel = xAxisFormatter.format(xValue);
-    yAxisLabel = yAxisFormatter.format(yValue);
+		labelPaint.getTextBounds(xAxisLabel, 0, xAxisLabel.length(), rect);
+		xAxisLabelWidth = rect.width();
+		xAxisLabelHeight = rect.height();
 
-    Rect rect = new Rect();
-
-    labelPaint.getTextBounds(xAxisLabel, 0, xAxisLabel.length(), rect);
-    xAxisLabelWidth = rect.width();
-    xAxisLabelHeight = rect.height();
-
-    labelPaint.getTextBounds(yAxisLabel, 0, yAxisLabel.length(), rect);
-    yAxisLabelWidth = rect.width();
-    yAxisLabelHeight = rect.height();
+		if(!isYNull())
+		{
+			y = yAxisFormatter.toFloat(yValue);
+			yAxisLabel = yAxisFormatter.format(yValue);
+			labelPaint.getTextBounds(yAxisLabel, 0, yAxisLabel.length(), rect);
+			yAxisLabelWidth = rect.width();
+			yAxisLabelHeight = rect.height();
+		}
   }
 }

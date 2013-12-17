@@ -28,6 +28,7 @@ import android.graphics.Paint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventListenerProxy;
 
 public class Line<XT, YT>
 {
@@ -132,6 +133,10 @@ public class Line<XT, YT>
       @Override
       public int compare(LinePoint lhs, LinePoint rhs)
       {
+				if(lhs.isYNull() || rhs.isYNull())
+				{
+					return 0;
+				}
         return Float.compare(lhs.getY(), rhs.getY());
       }
 
@@ -146,6 +151,10 @@ public class Line<XT, YT>
       @Override
       public int compare(LinePoint lhs, LinePoint rhs)
       {
+				if(lhs.isYNull() || rhs.isYNull())
+				{
+					return 0;
+				}
         return Float.compare(lhs.getY(), rhs.getY());
       }
 
@@ -173,6 +182,10 @@ public class Line<XT, YT>
       @Override
       public int compare(LinePoint lhs, LinePoint rhs)
       {
+				if(lhs.isYNull() || rhs.isYNull())
+				{
+					return 0;
+				}
         return Float.compare(lhs.getYAxisLabelWidth(), rhs.getYAxisLabelWidth());
       }
     });
@@ -199,6 +212,10 @@ public class Line<XT, YT>
       @Override
       public int compare(LinePoint lhs, LinePoint rhs)
       {
+				if(lhs.isYNull() || rhs.isYNull())
+				{
+					return 0;
+				}
         return Float.compare(lhs.getYAxisLabelHeight(), rhs.getYAxisLabelHeight());
       }
     });
@@ -212,6 +229,10 @@ public class Line<XT, YT>
       @Override
       public int compare(LinePoint lhs, LinePoint rhs)
       {
+				if(lhs.isYNull() || rhs.isYNull())
+				{
+					return 0;
+				}
         return Float.compare(lhs.getPointY(), rhs.getPointY());
       }
     });
@@ -235,15 +256,73 @@ public class Line<XT, YT>
     }
   }
 
-//	public void getXLabels(Map<Float,String> labels)
-//	{
-//		for(LinePoint linePoint: points)
-//		{
-//			if(!labels.containsKey(linePoint.getX()))
-//			{
-//				labels.put(linePoint.getX(),linePoint.getXAxisLabel());
-//			}
-//		}
-//	}
+	public LinePoint<XT,YT> findPointX(Integer value)
+	{
+		for (LinePoint<XT, YT> p : points)
+		{
+			if(p.getXValue().equals(value))
+			{
+				return p;
+			}
+		}
+		return null;
+	}
+	public void fillXAxisPoints(int start, int end)
+	{
+		ArrayList<LinePoint<XT, YT>> filledpoints = new ArrayList<LinePoint<XT, YT>>();
+
+		int pos = start;
+		while(pos <= end)
+		{
+
+			LinePoint<XT,YT> point = findPointX(pos);
+			if(point == null)
+			{
+				point = new LinePoint<XT,YT>(pos);
+			}
+			filledpoints.add(point);
+			pos++;
+		}
+		points = filledpoints;
+
+	}
+
+	public void rotateToStartAt(int start)
+	{
+		ArrayList<LinePoint<XT, YT>> rotatedpoints = new ArrayList<LinePoint<XT, YT>>();
+		LinePoint<XT,YT> firstPoint = null;
+		for(LinePoint<XT,YT> point: points)
+		{
+			if(firstPoint == null)
+			{
+				if(point.getXValue().equals(Integer.valueOf(start)))
+				{
+					firstPoint = point;
+					rotatedpoints.add(firstPoint);
+				}
+			}else
+			{
+				rotatedpoints.add(point);
+			}
+		}
+
+		if(firstPoint == null)
+		{
+			return;
+		}
+
+		for(LinePoint<XT,YT> point: points)
+		{
+			if(point.equals(firstPoint))
+			{
+				break;
+			}
+			rotatedpoints.add(point);
+		}
+		points = rotatedpoints;
+
+		xIsIndex = true;
+
+	}
 
 }
