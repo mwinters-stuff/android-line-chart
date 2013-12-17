@@ -29,6 +29,7 @@ import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.Path.Direction;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -500,6 +501,8 @@ public class LineChart<XT, YT> extends View
 
         for (LinePoint<XT, YT> p : line.getPoints())
         {
+					if(!p.isYNull())
+					{
           mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius + 1.0F * mDensity, mDotPaint);
           mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius, mDotShadowPaint);
 
@@ -518,6 +521,7 @@ public class LineChart<XT, YT> extends View
 //                }
 
           pointCount++;
+					}
         }
       }
     }
@@ -545,6 +549,8 @@ public class LineChart<XT, YT> extends View
         mPath.reset();
         for (LinePoint<XT, YT> p : line.getPoints())
         {
+					if(!p.isYNull())
+					{
           if (count == 0)
           {
             mPath.moveTo(p.getPointX(), p.getPointY());
@@ -553,6 +559,7 @@ public class LineChart<XT, YT> extends View
             mPath.lineTo(p.getPointX(), p.getPointY());
           }
           count++;
+					}
         }
         mCanvas.drawPath(mPath, mChartPaint);
       }else if(line.getSize() == 1)
@@ -681,7 +688,7 @@ public class LineChart<XT, YT> extends View
     float step = (maxY - minY) / (yStep - 1);
     float value = minY;
 
-    for (int i = 0; i <= yStep - 1; i++)
+    for (int i = 0; i <= yStep - 2; i++)
     {
       float yPercent = ((int) (mYAxisFormatter.roundAxisValue(value - minY))) / (maxY - minY);
       float y = getHeight() - bottomPadding - (usableHeight * yPercent);
@@ -716,10 +723,11 @@ public class LineChart<XT, YT> extends View
         int count = 0;
         for (LinePoint<XT, YT> p : line.getPoints())
         {
+					Log.d("POINT", p.toString());
           float yPercent = (p.getY() - minY) / (maxY - minY);
           float px = line.isxIsIndex() ? line.getPoints().indexOf(p) : p.getX();
 
-          float xPercent = (px - minX) / (maxX - minX);
+          float xPercent =px == 0 ? 0 : (px - minX) / (maxX - minX);
           if (count == 0)
           {
             float lastXPixels = leftPadding + (xPercent * usableWidth);
@@ -800,7 +808,8 @@ public class LineChart<XT, YT> extends View
     mListener = listener;
   }
 
-  public interface OnPointClickedListener
+
+	public interface OnPointClickedListener
   {
     abstract void onClick(int lineIndex, int pointIndex);
   }
