@@ -32,23 +32,22 @@ import java.text.DecimalFormat;
 
 public class LinePoint<XT, YT>
 {
-  private XT xValue;
-  private YT yValue;
-  private float x = 0;
-  private float y = 0;
-  private Path   path = new Path();
-  private Region region = new Region();
-  private String xAxisLabel = "";
-  private String yAxisLabel = "";
+  private final XT xValue;
+  private final YT yValue;
+  private       float  x          = 0;
+  private       float  y          = 0;
+  private final Path   path       = new Path();
+  private final Region region     = new Region();
+  private       String xAxisLabel = "";
+  private       String yAxisLabel = "";
 
   private float pointX;
   private float pointY;
   private float xAxisLabelWidth;
   private float yAxisLabelWidth;
   private float xAxisLabelHeight;
-  private float yAxisLabelHeight;
 
-  private static DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+  private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
 
   public LinePoint(XT xValue, YT yValue)
   {
@@ -56,16 +55,18 @@ public class LinePoint<XT, YT>
     this.yValue = yValue;
   }
 
-	public LinePoint(int xvalue)
-	{
-		this.xValue = (XT)Integer.valueOf(xvalue);
-		this.yValue = null;
-	}
+  @SuppressWarnings("unchecked")
+  public LinePoint(int xValue)
+  {
+    this.xValue = (XT) Integer.valueOf(xValue);
+    this.yValue = null;
+  }
 
-	public boolean isYNull()
-	{
-		return this.yValue == null;
-	}
+  public boolean isYNotNull()
+  {
+    return this.yValue != null;
+  }
+
   public float getX()
   {
     return x;
@@ -205,13 +206,13 @@ public class LinePoint<XT, YT>
 		xAxisLabelWidth = rect.width();
 		xAxisLabelHeight = rect.height();
 
-		if(!isYNull())
+		if(isYNotNull())
 		{
 			y = yAxisFormatter.toFloat(yValue);
 			yAxisLabel = yAxisFormatter.format(yValue);
 			labelPaint.getTextBounds(yAxisLabel, 0, yAxisLabel.length(), rect);
 			yAxisLabelWidth = rect.width();
-			yAxisLabelHeight = rect.height();
+      //float yAxisLabelHeight = rect.height();
 		}
   }
 }

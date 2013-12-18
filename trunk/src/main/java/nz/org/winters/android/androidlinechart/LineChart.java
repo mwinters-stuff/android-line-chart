@@ -28,7 +28,6 @@ import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.Bitmap.Config;
 import android.graphics.Path.Direction;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
@@ -39,13 +38,13 @@ import java.util.*;
 public class LineChart<XT, YT> extends View
 {
 
-  private   ArrayList<Line<XT, YT>> mLines     = new ArrayList<Line<XT, YT>>();
-  private   Map<Float, String>      mXLabels   = new HashMap<Float, String>();
-  protected ScorecardView           mScoreCard = new ScorecardView(getContext());
+  private       ArrayList<Line<XT, YT>> mLines     = new ArrayList<Line<XT, YT>>();
+  private final Map<Float, String>      mXLabels   = new HashMap<Float, String>();
+  private final ScorecardView           mScoreCard = new ScorecardView(getContext());
 
-  private Path   mPath   = new Path();
-  private Path   mPath2  = new Path();
-  private Canvas mCanvas = new Canvas();
+  private final Path   mPath   = new Path();
+  private final Path   mPath2  = new Path();
+  private final Canvas mCanvas = new Canvas();
 
   private XAxisFormatter<XT> mXAxisFormatter = null;
   private YAxisFormatter<YT> mYAxisFormatter = null;
@@ -54,29 +53,27 @@ public class LineChart<XT, YT> extends View
   private float   mMaxY           = Float.MIN_VALUE;//, mMaxX = 0;
   private float   mMinX           = Float.MAX_VALUE;//, mMinX = 0;
   private float   mMaxX           = Float.MIN_VALUE;//, mMaxX = 0;
-  private float   mMaxYNoRounding = Float.MIN_VALUE;
-  private float   mMinYNoRounding = Float.MAX_VALUE;
+//  private float   mMaxYNoRounding = Float.MIN_VALUE;
+//  private float   mMinYNoRounding = Float.MAX_VALUE;
   private boolean mIsMaxYUserSet  = false;
-  private int     mLineToFill     = -1;
+  // --Commented out by Inspection (18/12/13 4:08 PM):private int     mLineToFill     = -1;
   private int     mIndexSelected  = -1;
-  private OnPointClickedListener mListener;
-  private Bitmap                 mFullImage;
+  private OnPointClickedListener<XT, YT> mListener;
+  private Bitmap                         mFullImage;
 
-  private boolean            mShouldUpdate    = false;
-  private PorterDuffXfermode mPorterDuffClear = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
-  private Region             mRegion          = new Region();
-  private Rect               mRect            = new Rect();
+  private       boolean            mShouldUpdate    = false;
+  // --Commented out by Inspection (18/12/13 4:08 PM):private       PorterDuffXfermode mPorterDuffClear = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+  private final Region             mRegion          = new Region();
+  private final Rect               mRect            = new Rect();
 
   private int mYAxisLabels      = 4;
   private int mXAxisLabelsEvery = 1;
 
-  private Resources mResources = getResources();
+  private final Resources mResources = getResources();
   private float   mDensity;
-  private float   mFontScale;
-  private float   mLabelPadding;
   private float   mDotRadius;
   private float   mTextSize;
-  private int     mCurrentPosition;
+  // --Commented out by Inspection (18/12/13 4:08 PM):private int     mCurrentPosition;
   private boolean mSelectedPressed;
 
 
@@ -85,30 +82,32 @@ public class LineChart<XT, YT> extends View
     super(context);
   }
 
-  public LineChart(Context context, AttributeSet attrs)
-  {
-    super(context, attrs);
-  }
+// --Commented out by Inspection START (18/12/13 4:08 PM):
+//  public LineChart(Context context, AttributeSet attrs)
+//  {
+//    super(context, attrs);
+//  }
+// --Commented out by Inspection STOP (18/12/13 4:08 PM)
 
-  protected final Path  mBorder               = new Path();
-  protected final Paint mBorderPaint          = new Paint(1);
-  protected final Paint mBrightGridPaint      = new Paint(1);
-  protected final Paint mBrightLabelTextPaint = new Paint(1);
-  protected final Paint mChartPaint           = new Paint(1);
-  protected final Path  mChartPath            = new Path();
-  protected final Paint mDotPaint             = new Paint(1);
-  protected final Paint mDotShadowPaint       = new Paint(1);
-  protected final Paint mGridPaint            = new Paint(1);
-  protected final Paint mLabelPaint           = new Paint(1);
-  protected final Paint mLabelPaintLeft       = new Paint(1);
-  protected       Paint mLabelPaintLeftStroke = new Paint(1);
-  protected final Paint mScoreCardBorderPaint = new Paint(1);
-  protected final Paint mScoreCardPaint       = new Paint(1);
-  protected final Paint mTextPaint            = new Paint(1);
-  protected int mHoloLightBlue;
+  // --Commented out by Inspection (18/12/13 4:09 PM):private final   Path  mBorder               = new Path();
+  private final   Paint mBorderPaint          = new Paint(1);
+  private final   Paint mBrightGridPaint      = new Paint(1);
+  private final   Paint mBrightLabelTextPaint = new Paint(1);
+  private final   Paint mChartPaint           = new Paint(1);
+  // --Commented out by Inspection (18/12/13 4:09 PM):protected final Path  mChartPath            = new Path();
+  private final   Paint mDotPaint             = new Paint(1);
+  private final   Paint mDotShadowPaint       = new Paint(1);
+  private final   Paint mGridPaint            = new Paint(1);
+  private final   Paint mLabelPaint           = new Paint(1);
+  private final   Paint mLabelPaintLeft       = new Paint(1);
+  private final   Paint mScoreCardBorderPaint = new Paint(1);
+  private final   Paint mScoreCardPaint       = new Paint(1);
+  private final   Paint mTextPaint            = new Paint(1);
+  private int mHoloLightBlue;
 
 
-  protected void initializePaint()
+  @SuppressWarnings("ConstantConditions")
+  void initializePaint()
   {
     mHoloLightBlue = mResources.getColor(R.color.holo_blue_light);
 
@@ -145,7 +144,7 @@ public class LineChart<XT, YT> extends View
     mLabelPaintLeft.setStrokeWidth(3.0F * mDensity);
     mLabelPaintLeft.setShadowLayer(2.0F, 1.0F, 1.0F, mResources.getColor(R.color.text_shadow_white));
 
-    mLabelPaintLeftStroke = new Paint(mLabelPaintLeft);
+    Paint mLabelPaintLeftStroke = new Paint(mLabelPaintLeft);
     mLabelPaintLeftStroke.setStyle(Paint.Style.FILL_AND_STROKE);
     mLabelPaintLeftStroke.setStrokeWidth(2.0F * mDensity);
     mLabelPaintLeftStroke.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -181,11 +180,6 @@ public class LineChart<XT, YT> extends View
   }
 
 
-  public void setMinY(float minY)
-  {
-
-  }
-
   public void removeAllLines()
   {
     while (mLines.size() > 0)
@@ -202,8 +196,8 @@ public class LineChart<XT, YT> extends View
       mMaxY = Float.MIN_VALUE;//, mMaxX = 0;
       mMinX = Float.MAX_VALUE;//, mMinX = 0;
       mMaxX = Float.MIN_VALUE;//, mMaxX = 0;
-      mMaxYNoRounding = Float.MIN_VALUE;
-      mMinYNoRounding = Float.MAX_VALUE;//, mMinX = 0;
+   //   mMaxYNoRounding = Float.MIN_VALUE;
+   //   mMinYNoRounding = Float.MAX_VALUE;//, mMinX = 0;
     }
   }
 
@@ -225,8 +219,8 @@ public class LineChart<XT, YT> extends View
   public void draw()
   {
     mDensity = mResources.getDisplayMetrics().density;
-    mFontScale = mResources.getConfiguration().fontScale;
-    mLabelPadding = (6.0F * mDensity);
+    float mFontScale = mResources.getConfiguration().fontScale;
+   // float mLabelPadding = (6.0F * mDensity);
     mDotRadius = (3.0F * mDensity);
     mTextSize = (12.0F * mDensity * mFontScale);
 
@@ -262,44 +256,48 @@ public class LineChart<XT, YT> extends View
       mMinY = xMinY - ((xMaxY + xMinY) / mYAxisLabels);
     }
 
-    mMaxYNoRounding = max;
+   // mMaxYNoRounding = max;
     mIsMaxYUserSet = true;
   }
 
-  public float getMaxYNoRounding()
-  {
-    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxYNoRounding == Float.MIN_VALUE))
-    {
-      mMaxYNoRounding = Collections.max(mLines, new Comparator<Line>()
-      {
-        @Override
-        public int compare(Line lhs, Line rhs)
-        {
-          return Float.compare(lhs.getMaxY(), rhs.getMaxY());
-        }
-      }).getMaxY();
-    }
-    return mMaxYNoRounding == Float.MIN_VALUE ? 0 : mMaxYNoRounding;
-  }
+// --Commented out by Inspection START (18/12/13 4:19 PM):
+//  float getMaxYNoRounding()
+//  {
+//    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxYNoRounding == Float.MIN_VALUE))
+//    {
+//      mMaxYNoRounding = Collections.max(mLines, new Comparator<Line>()
+//      {
+//        @Override
+//        public int compare(Line lhs, Line rhs)
+//        {
+//          return Float.compare(lhs.getMaxY(), rhs.getMaxY());
+//        }
+//      }).getMaxY();
+//    }
+//    return mMaxYNoRounding == Float.MIN_VALUE ? 0 : mMaxYNoRounding;
+//  }
+// --Commented out by Inspection STOP (18/12/13 4:19 PM)
 
 
-  public float getMinYNoRounding()
-  {
-    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinYNoRounding == Float.MAX_VALUE))
-    {
-      mMinYNoRounding = Collections.min(mLines, new Comparator<Line>()
-      {
-        @Override
-        public int compare(Line lhs, Line rhs)
-        {
-          return Float.compare(lhs.getMinY(), rhs.getMinY());
-        }
-      }).getMinY();
-    }
-    return mMinYNoRounding == Float.MIN_VALUE ? 0 : mMinYNoRounding;
-  }
+// --Commented out by Inspection START (18/12/13 4:19 PM):
+//  float getMinYNoRounding()
+//  {
+//    if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinYNoRounding == Float.MAX_VALUE))
+//    {
+//      mMinYNoRounding = Collections.min(mLines, new Comparator<Line>()
+//      {
+//        @Override
+//        public int compare(Line lhs, Line rhs)
+//        {
+//          return Float.compare(lhs.getMinY(), rhs.getMinY());
+//        }
+//      }).getMinY();
+//    }
+//    return mMinYNoRounding == Float.MIN_VALUE ? 0 : mMinYNoRounding;
+//  }
+// --Commented out by Inspection STOP (18/12/13 4:19 PM)
 
-  public float getMaxY()
+  float getMaxY()
   {
     float miny = getMinY(); // ensures calculated first
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxY == Float.MIN_VALUE))
@@ -312,7 +310,7 @@ public class LineChart<XT, YT> extends View
           return Float.compare(lhs.getMaxY(), rhs.getMaxY());
         }
       }).getMaxY();
-      // round up to nearist 10..
+
       mMaxY = roundUp(mMaxY);
       mMaxY = mMaxY + ((mMaxY - miny) / mYAxisLabels);
 
@@ -321,7 +319,7 @@ public class LineChart<XT, YT> extends View
     return mMaxY == Float.MIN_VALUE ? 0 : mMaxY;
   }
 
-  public float getMinY()
+  float getMinY()
   {
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinY == Float.MAX_VALUE))
     {
@@ -334,17 +332,13 @@ public class LineChart<XT, YT> extends View
         }
       }).getMinY();
 
-      // round minY down to nearist 10..
+
       mMinY = roundDown(mMinY);
-//      if (mMinY != 0)
-//      {
-//        mMinY = mMinY - ((mMaxY + mMinY) / mYAxisLabels);
-//      }
     }
     return mMinY == Float.MAX_VALUE ? 0 : mMinY;
   }
 
-  public float getMaxX()
+  float getMaxX()
   {
     if (mLines.size() > 0 && mMaxX == Float.MIN_VALUE)
     {
@@ -360,7 +354,7 @@ public class LineChart<XT, YT> extends View
     return mMaxX == Float.MIN_VALUE ? 0 : mMaxX;
   }
 
-  public float getMinX()
+  float getMinX()
   {
     if (mLines.size() > 0 && mMinX == Float.MAX_VALUE)
     {
@@ -376,7 +370,7 @@ public class LineChart<XT, YT> extends View
     return mMinX == Float.MAX_VALUE ? 0 : mMinX;
   }
 
-  public float getTextWidthY()
+  float getTextWidthY()
   {
     if (mLines.size() > 0)
     {
@@ -392,7 +386,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  public float getTextWidthX()
+  float getTextWidthX()
   {
     if (mLines.size() > 0)
     {
@@ -408,7 +402,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  public float getTextHeightY()
+  float getTextHeightY()
   {
     if (mLines.size() > 0)
     {
@@ -424,7 +418,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  public float getTextHeightX()
+  float getTextHeightX()
   {
     if (mLines.size() > 0)
     {
@@ -465,11 +459,11 @@ public class LineChart<XT, YT> extends View
       calculatePoints(bottomPadding, leftPadding, usableHeight, usableWidth);
 
 
-      drawLines(topPadding, leftPadding, usableHeight, usableWidth);
+      drawLines();
 
-      drawDots(topPadding, leftPadding, usableHeight, usableWidth);
+      drawDots();
 
-      drawYAxisLabels(bottomPadding, topPadding, leftPadding, usableHeight);
+      drawYAxisLabels(bottomPadding, usableHeight);
       drawXAxis(bottomPadding, leftPadding, rightPadding, usableWidth);
 
       mShouldUpdate = false;
@@ -487,7 +481,7 @@ public class LineChart<XT, YT> extends View
   {
     if (mXAxisFormatter == null || mYAxisFormatter == null)
     {
-      assert (true);
+      return;
     }
 
     for (Line<XT, YT> line : mLines)
@@ -496,7 +490,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawDots(float topPadding, float leftPadding, float usableHeight, float usableWidth)
+  private void drawDots()
   {
     int pointCount = 0;
     // draws dots..
@@ -507,17 +501,17 @@ public class LineChart<XT, YT> extends View
 
         for (LinePoint<XT, YT> p : line.getPoints())
         {
-          if (!p.isYNull())
+          if (p.isYNotNull())
           {
             mDotPaint.setColor(line.getColor());
             mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius + 1.0F * mDensity, mDotPaint);
             mCanvas.drawCircle(p.getPointX(), p.getPointY(), mDotRadius, mDotShadowPaint);
 
             mPath2.reset();
-            float pathsize = mDotRadius * (5 * mDensity);
-            mPath2.addCircle(p.getPointX(), p.getPointY(), pathsize, Direction.CW);
+            float pathSize = mDotRadius * (5 * mDensity);
+            mPath2.addCircle(p.getPointX(), p.getPointY(), pathSize, Direction.CW);
             p.setPath(mPath2);
-            mRegion.set((int) (p.getPointX() - pathsize), (int) (p.getPointY() - pathsize), (int) (p.getPointX() + pathsize), (int) (p.getPointY() + pathsize));
+            mRegion.set((int) (p.getPointX() - pathSize), (int) (p.getPointY() - pathSize), (int) (p.getPointX() + pathSize), (int) (p.getPointY() + pathSize));
             p.setRegion(mRegion);
 
             if (mIndexSelected == pointCount && mSelectedPressed)
@@ -537,7 +531,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawLines(float topPadding, float leftPadding, float usableHeight, float usableWidth)
+  private void drawLines()
   {
     for (Line<XT, YT> line : mLines)
     {
@@ -550,7 +544,7 @@ public class LineChart<XT, YT> extends View
         mPath.reset();
         for (LinePoint<XT, YT> p : line.getPoints())
         {
-          if (!p.isYNull())
+          if (p.isYNotNull())
           {
             if (count == 0)
             {
@@ -597,9 +591,9 @@ public class LineChart<XT, YT> extends View
 
       float y = getHeight() - bottomPadding;
       float textHeight = getTextHeightX();
-      float textWidth = getTextWidthX() + (mDensity * 2);
+      float textWidth = getTextWidthX() + (mDensity * 4);
       float maxCanShow = (usableWidth / textWidth);
-      int stepMaxCanShow = (int) (mXLabels.size() / maxCanShow);
+      int stepMaxCanShow = (int)((mXLabels.size()  / maxCanShow) + .5);
       if (mXAxisLabelsEvery > stepMaxCanShow)
       {
         stepMaxCanShow = mXAxisLabelsEvery;
@@ -607,7 +601,7 @@ public class LineChart<XT, YT> extends View
 
 
       float textWidthX = getTextWidthX();
-      //float xstep = usableWidth / (float)labels.size();
+
       int i = 1;
       int index = 0;
       for (Pair<Float, String> point : xAxisLabels)
@@ -664,10 +658,8 @@ public class LineChart<XT, YT> extends View
     return value;
   }
 
-  private void drawYAxisLabels(float bottomPadding, float topPadding, float leftPadding, float usableHeight)
+  private void drawYAxisLabels(float bottomPadding, float usableHeight)
   {
-    int count = 0;
-
     float maxY = getMaxY();
     float minY = getMinY();
 
@@ -678,10 +670,6 @@ public class LineChart<XT, YT> extends View
       yStep -= 5;
     }
 
-    float rawMaxY = getMaxYNoRounding();
-    float rawMinY = getMinYNoRounding();
-
-//    float step = (rawMaxY - rawMinY) / (yStep - 1);
     float step = (maxY - minY) / (yStep - 1);
     float value = minY;
 
@@ -740,6 +728,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
+  @SuppressWarnings("NullableProblems")
   @Override
   public boolean onTouchEvent(MotionEvent event)
   {
@@ -751,51 +740,53 @@ public class LineChart<XT, YT> extends View
 
     int count = 0;
     int lineCount = 0;
-    int pointCount = 0;
+    int pointCount;
     boolean selected = false;
 
     Region r = new Region();
     for (Line<XT, YT> line : mLines)
     {
-      pointCount = 0;
-      for (LinePoint<XT, YT> p : line.getPoints())
+      if(line.isShowingPoints())
       {
-
-        if (p.getPath() != null && p.getRegion() != null)
+        pointCount = 0;
+        for (LinePoint<XT, YT> p : line.getPoints())
         {
-          r.setPath(p.getPath(), p.getRegion());
-          if (r.contains((int) point.x, (int) point.y) && event.getAction() == MotionEvent.ACTION_DOWN)
+
+          if (p.getPath() != null && p.getRegion() != null)
           {
-            mIndexSelected = count;
-
-            mFingerPositionX = p.getPointX();
-            mFingerPositionY = p.getPointY();
-
-            mLabelTextLine1 = p.getXAxisLabel();
-            mLabelTextLine2 = p.getYValue().toString();
-            mMaxLabelTextWidth = Math.max(p.getXAxisLabelWidth(),p.getYAxisLabelWidth());
-
-            mSelectedPressed = true;
-            selected = true;
-          } else if (event.getAction() == MotionEvent.ACTION_UP)
-          {
-            if (r.contains((int) point.x, (int) point.y))
+            r.setPath(p.getPath(), p.getRegion());
+            if (r.contains(point.x, point.y) && event.getAction() == MotionEvent.ACTION_DOWN)
             {
-              if(mListener != null)
-              {
-                mListener.onClick(lineCount, pointCount);
-              }
-              mSelectedPressed = false;
+              mIndexSelected = count;
+
+              mFingerPositionX = p.getPointX();
+              mFingerPositionY = p.getPointY();
+
+              mLabelTextLine1 = p.getXAxisLabel();
+              mLabelTextLine2 = p.getYValue().toString();
+              //mMaxLabelTextWidth = Math.max(p.getXAxisLabelWidth(),p.getYAxisLabelWidth());
+
+              mSelectedPressed = true;
               selected = true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP)
+            {
+              if (r.contains(point.x,point.y))
+              {
+                if(mListener != null)
+                {
+                  mListener.onClick(p,lineCount, pointCount);
+                }
+                mSelectedPressed = false;
+                selected = true;
+              }
             }
           }
-        }
 
-        pointCount++;
-        count++;
+          pointCount++;
+          count++;
+        }
       }
       lineCount++;
-
     }
 
     if(!selected)
@@ -813,15 +804,15 @@ public class LineChart<XT, YT> extends View
     return true;
   }
 
-  public void setOnPointClickedListener(OnPointClickedListener listener)
+  public void setOnPointClickedListener(OnPointClickedListener<XT,YT> listener)
   {
     mListener = listener;
   }
 
 
-  public interface OnPointClickedListener
+  public interface OnPointClickedListener<XT,YT>
   {
-    abstract void onClick(int lineIndex, int pointIndex);
+    abstract void onClick(LinePoint<XT,YT> point, int lineIndex, int pointIndex);
   }
 
   public int getXAxisLabelsEvery()
@@ -854,42 +845,39 @@ public class LineChart<XT, YT> extends View
     mYAxisFormatter = axisFormatter;
   }
 
-  protected float  mLabelPositionX;
-  protected float  mLabelPositionY;
-//  protected Point  mFingerPosition;
-  protected float  mFingerPositionX;
-  protected float  mFingerPositionY;
-  protected float  mMaxLabelTextWidth;
-  protected float  mLabelRightMargin;
-  protected float  mLabelLeftMargin;
-  protected float  mOffset;
-  protected String mLabelTextLine1;
-  protected String mLabelTextLine2;
+ // private float mLabelPositionY = 0;
+  //  protected Point  mFingerPosition;
+  private float  mFingerPositionX;
+  private float  mFingerPositionY;
+  //private float  mMaxLabelTextWidth;
+  private String mLabelTextLine1;
+  private String mLabelTextLine2;
 
 
-  protected void drawCursorLabel(Canvas paramCanvas)
+  void drawCursorLabel(Canvas paramCanvas)
   {
     if (mIndexSelected < 0)
     {
       return;
     }
-    mLabelPositionX = mFingerPositionX;
-    mLabelPositionY = mFingerPositionY;
-    mMaxLabelTextWidth = Math.max(mLabelPaint.measureText(mLabelTextLine1), mLabelPaint.measureText(mLabelTextLine2));
-    mLabelRightMargin = (mLabelPositionX + mMaxLabelTextWidth / 2.0F + mOffset);
-    mLabelLeftMargin = (mLabelPositionX - mMaxLabelTextWidth / 2.0F - mOffset);
-    if (mLabelRightMargin > getWidth())
-    {
-      mLabelLeftMargin -= mLabelRightMargin - getWidth();
-      mLabelPositionX -= mLabelRightMargin - getWidth();
-      mLabelRightMargin = getWidth();
-    }
-    if (mLabelLeftMargin < 0.0F)
-    {
-      mLabelRightMargin += -mLabelLeftMargin;
-      mLabelPositionX += -mLabelLeftMargin;
-      mLabelLeftMargin = 0.0F;
-    }
+ //   float mLabelPositionX = mFingerPositionX;
+  //  mLabelPositionY = mFingerPositionY;
+   // mMaxLabelTextWidth = Math.max(mLabelPaint.measureText(mLabelTextLine1), mLabelPaint.measureText(mLabelTextLine2));
+  //  float mOffset = 0;
+ //   float mLabelRightMargin = (mLabelPositionX + mMaxLabelTextWidth / 2.0F + mOffset);
+ //   float mLabelLeftMargin = (mLabelPositionX - mMaxLabelTextWidth / 2.0F - mOffset);
+ //   if (mLabelRightMargin > getWidth())
+//    {
+    //  mLabelLeftMargin -= mLabelRightMargin - getWidth();
+     // mLabelPositionX -= mLabelRightMargin - getWidth();
+     // mLabelRightMargin = getWidth();
+ //   }
+ //   if (mLabelLeftMargin < 0.0F)
+//    {
+    //  mLabelRightMargin += -mLabelLeftMargin;
+     // mLabelPositionX += -mLabelLeftMargin;
+      //mLabelLeftMargin = 0.0F;
+//    }
     mScoreCard.setFingerPosition(new Point((int) mFingerPositionX, (int) mFingerPositionY));
     ScorecardView localScorecardView = mScoreCard;
     String[] arrayOfString = new String[2];
@@ -899,5 +887,21 @@ public class LineChart<XT, YT> extends View
     mScoreCard.draw(paramCanvas);
   }
 
+
+  public void fillXAxisPoints(int start, int end)
+  {
+    for (Line<XT, YT> line : mLines)
+    {
+      line.fillXAxisPoints(start, end);
+    }
+  }
+
+  public void rotateToStartAt(int start)
+  {
+    for (Line<XT, YT> line : mLines)
+    {
+      line.rotateToStartAt(start);
+    }
+  }
 
 }
