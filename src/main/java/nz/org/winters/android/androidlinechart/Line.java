@@ -28,7 +28,6 @@ import android.graphics.Paint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EventListenerProxy;
 
 public class Line<XT, YT>
 {
@@ -57,6 +56,7 @@ public class Line<XT, YT>
     this.points = points;
   }
 
+  @SuppressWarnings("WeakerAccess")
   public void addPoint(LinePoint<XT, YT> point)
   {
     points.add(point);
@@ -67,6 +67,7 @@ public class Line<XT, YT>
     addPoint(new LinePoint<XT, YT>(x, y));
   }
 
+  @SuppressWarnings("SameParameterValue")
   public LinePoint<XT, YT> getPoint(int index)
   {
     return points.get(index);
@@ -131,7 +132,7 @@ public class Line<XT, YT>
     float min= Float.MAX_VALUE;
     for(LinePoint point: points)
     {
-      if(!point.isYNull())
+      if(point.isYNotNull())
       {
         min = Math.min(min,point.getY());
       }
@@ -144,7 +145,7 @@ public class Line<XT, YT>
     float max= Float.MIN_VALUE;
     for(LinePoint point: points)
     {
-      if(!point.isYNull())
+      if(point.isYNotNull())
       {
         max = Math.max(max,point.getY());
       }
@@ -170,7 +171,7 @@ public class Line<XT, YT>
     float max= Float.MIN_VALUE;
     for(LinePoint point: points)
     {
-      if(!point.isYNull())
+      if(point.isYNotNull())
       {
         max = Math.max(max,point.getYAxisLabelWidth());
       }
@@ -196,7 +197,7 @@ public class Line<XT, YT>
     float max= Float.MIN_VALUE;
     for(LinePoint point: points)
     {
-      if(!point.isYNull())
+      if(point.isYNotNull())
       {
         max = Math.max(max,point.getYAxisLabelHeight());
       }
@@ -204,18 +205,20 @@ public class Line<XT, YT>
     return max == Float.MIN_VALUE ? 0 : max;
   }
 
-  public float getMaxPointY()
-  {
-    float max= Float.MIN_VALUE;
-    for(LinePoint point: points)
-    {
-      if(!point.isYNull())
-      {
-        max = Math.max(max,point.getPointY());
-      }
-    }
-    return max == Float.MIN_VALUE ? 0 : max;
-  }
+// --Commented out by Inspection START (18/12/13 4:08 PM):
+//  public float getMaxPointY()
+//  {
+//    float max= Float.MIN_VALUE;
+//    for(LinePoint point: points)
+//    {
+//      if(point.isYNotNull())
+//      {
+//        max = Math.max(max,point.getPointY());
+//      }
+//    }
+//    return max == Float.MIN_VALUE ? 0 : max;
+//  }
+// --Commented out by Inspection STOP (18/12/13 4:08 PM)
 
   @Override
   public String toString()
@@ -234,7 +237,7 @@ public class Line<XT, YT>
     }
   }
 
-	public LinePoint<XT,YT> findPointX(Integer value)
+	LinePoint<XT,YT> findPointX(Integer value)
 	{
 		for (LinePoint<XT, YT> p : points)
 		{
@@ -245,7 +248,8 @@ public class Line<XT, YT>
 		}
 		return null;
 	}
-	public void fillXAxisPoints(int start, int end)
+
+  public void fillXAxisPoints(int start, int end)
 	{
 		ArrayList<LinePoint<XT, YT>> filledpoints = new ArrayList<LinePoint<XT, YT>>();
 
@@ -267,20 +271,20 @@ public class Line<XT, YT>
 
 	public void rotateToStartAt(int start)
 	{
-		ArrayList<LinePoint<XT, YT>> rotatedpoints = new ArrayList<LinePoint<XT, YT>>();
+		ArrayList<LinePoint<XT, YT>> rotatedPoints = new ArrayList<LinePoint<XT, YT>>();
 		LinePoint<XT,YT> firstPoint = null;
 		for(LinePoint<XT,YT> point: points)
 		{
 			if(firstPoint == null)
 			{
-				if(point.getXValue().equals(Integer.valueOf(start)))
+				if(point.getXValue().equals(start))
 				{
 					firstPoint = point;
-					rotatedpoints.add(firstPoint);
+					rotatedPoints.add(firstPoint);
 				}
 			}else
 			{
-				rotatedpoints.add(point);
+				rotatedPoints.add(point);
 			}
 		}
 
@@ -295,9 +299,9 @@ public class Line<XT, YT>
 			{
 				break;
 			}
-			rotatedpoints.add(point);
+			rotatedPoints.add(point);
 		}
-		points = rotatedpoints;
+		points = rotatedPoints;
 
 		xIsIndex = true;
 
