@@ -762,11 +762,11 @@ public class LineChart<XT, YT> extends View
               mFingerPositionX = p.getPointX();
               mFingerPositionY = p.getPointY();
 
-              mLabelTextLine1 = p.getXAxisLabel();
-              mLabelTextLine2 = p.getYValue().toString();
-              //mMaxLabelTextWidth = Math.max(p.getXAxisLabelWidth(),p.getYAxisLabelWidth());
+              mLabelTextLine1 = p.getXPopoutValue();
+							mLabelTextLine2 = p.getYPopoutValue();
+							//mMaxLabelTextWidth = Math.max(p.getXAxisLabelWidth(),p.getYAxisLabelWidth());
 
-              mSelectedPressed = true;
+							mSelectedPressed = true;
               selected = true;
             } else if (event.getAction() == MotionEvent.ACTION_UP)
             {

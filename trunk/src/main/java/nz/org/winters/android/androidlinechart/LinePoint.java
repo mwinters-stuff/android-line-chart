@@ -27,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.text.TextUtils;
 
 import java.text.DecimalFormat;
 
@@ -46,6 +47,9 @@ public class LinePoint<XT, YT>
   private float xAxisLabelWidth;
   private float yAxisLabelWidth;
   private float xAxisLabelHeight;
+
+	private String xPopoutValue;
+	private String yPopoutValue;
 
   private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
 
@@ -90,7 +94,7 @@ public class LinePoint<XT, YT>
   public void setX(float x)
   {
     this.x = x;
-    this.xAxisLabel = decimalFormat.format(x);
+   	this.xAxisLabel = decimalFormat.format(x);
   }
 
   public float getY()
@@ -210,9 +214,30 @@ public class LinePoint<XT, YT>
 		{
 			y = yAxisFormatter.toFloat(yValue);
 			yAxisLabel = yAxisFormatter.format(yValue);
+
 			labelPaint.getTextBounds(yAxisLabel, 0, yAxisLabel.length(), rect);
 			yAxisLabelWidth = rect.width();
       //float yAxisLabelHeight = rect.height();
 		}
   }
+
+	public String getYPopoutValue()
+	{
+		return TextUtils.isEmpty(yPopoutValue) ? yAxisLabel : yPopoutValue;
+	}
+
+	public void setYPopoutValue(String yPopoutValue)
+	{
+		this.yPopoutValue = yPopoutValue;
+	}
+
+	public String getXPopoutValue()
+	{
+		return TextUtils.isEmpty(xPopoutValue) ? xAxisLabel : xPopoutValue;
+	}
+
+	public void setXPopoutValue(String xPopoutValue)
+	{
+		this.xPopoutValue = xPopoutValue;
+	}
 }
