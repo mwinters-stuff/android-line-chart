@@ -62,9 +62,11 @@ public class Line<XT, YT>
     points.add(point);
   }
 
-  public void addPoint(XT x, YT y)
+  public LinePoint<XT,YT> addPoint(XT x, YT y)
   {
-    addPoint(new LinePoint<XT, YT>(x, y));
+		LinePoint<XT,YT> point = new LinePoint<XT, YT>(x, y);
+    addPoint(point);
+		return point;
   }
 
   @SuppressWarnings("SameParameterValue")
