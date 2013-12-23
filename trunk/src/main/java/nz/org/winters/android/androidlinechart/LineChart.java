@@ -904,4 +904,18 @@ public class LineChart<XT, YT> extends View
     }
   }
 
+  public void setLineShowingPoints(int position)
+  {
+    mIndexSelected = -1;
+    mSelectedPressed = false;
+
+    for (Line<XT, YT> line : mLines)
+    {
+      line.setShowingPoints(false);
+    }
+    mLines.get(position).setShowingPoints(true);
+    draw();
+    invalidate();
+  }
+
 }
