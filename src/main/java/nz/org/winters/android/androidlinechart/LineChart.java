@@ -180,7 +180,7 @@ public class LineChart<XT, YT> extends View
   }
 
 
-  public void removeAllLines()
+  synchronized public void removeAllLines()
   {
     while (mLines.size() > 0)
     {
@@ -201,17 +201,17 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  public void addLine(Line<XT, YT> line)
+  synchronized public void addLine(Line<XT, YT> line)
   {
     mLines.add(line);
   }
 
-  public ArrayList<Line<XT, YT>> getLines()
+  synchronized public ArrayList<Line<XT, YT>> getLines()
   {
     return mLines;
   }
 
-  public void setLines(ArrayList<Line<XT, YT>> lines)
+  synchronized public void setLines(ArrayList<Line<XT, YT>> lines)
   {
     mLines = lines;
   }
@@ -234,17 +234,17 @@ public class LineChart<XT, YT> extends View
   }
 
 
-  public Line<XT, YT> getLine(int index)
+  synchronized public Line<XT, YT> getLine(int index)
   {
     return mLines.get(index);
   }
 
-  public int getSize()
+  synchronized public int getSize()
   {
     return mLines.size();
   }
 
-  public void setRangeY(float min, float max)
+  synchronized  public void setRangeY(float min, float max)
   {
     float xMinY = roundDown(min);
     float xMaxY = roundUp(max);
@@ -297,7 +297,7 @@ public class LineChart<XT, YT> extends View
 //  }
 // --Commented out by Inspection STOP (18/12/13 4:19 PM)
 
-  float getMaxY()
+  synchronized float getMaxY()
   {
     float miny = getMinY(); // ensures calculated first
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMaxY == Float.MIN_VALUE))
@@ -319,7 +319,7 @@ public class LineChart<XT, YT> extends View
     return mMaxY == Float.MIN_VALUE ? 0 : mMaxY;
   }
 
-  float getMinY()
+  synchronized float getMinY()
   {
     if (!mIsMaxYUserSet && (mLines.size() > 0 && mMinY == Float.MAX_VALUE))
     {
@@ -338,7 +338,7 @@ public class LineChart<XT, YT> extends View
     return mMinY == Float.MAX_VALUE ? 0 : mMinY;
   }
 
-  float getMaxX()
+  synchronized float getMaxX()
   {
     if (mLines.size() > 0 && mMaxX == Float.MIN_VALUE)
     {
@@ -354,7 +354,7 @@ public class LineChart<XT, YT> extends View
     return mMaxX == Float.MIN_VALUE ? 0 : mMaxX;
   }
 
-  float getMinX()
+  synchronized float getMinX()
   {
     if (mLines.size() > 0 && mMinX == Float.MAX_VALUE)
     {
@@ -370,7 +370,7 @@ public class LineChart<XT, YT> extends View
     return mMinX == Float.MAX_VALUE ? 0 : mMinX;
   }
 
-  float getTextWidthY()
+  synchronized float getTextWidthY()
   {
     if (mLines.size() > 0)
     {
@@ -386,7 +386,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  float getTextWidthX()
+  synchronized float getTextWidthX()
   {
     if (mLines.size() > 0)
     {
@@ -402,7 +402,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  float getTextHeightY()
+  synchronized float getTextHeightY()
   {
     if (mLines.size() > 0)
     {
@@ -418,7 +418,7 @@ public class LineChart<XT, YT> extends View
     return 0;
   }
 
-  float getTextHeightX()
+  synchronized float getTextHeightX()
   {
     if (mLines.size() > 0)
     {
@@ -490,7 +490,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawDots()
+  synchronized private void drawDots()
   {
     int pointCount = 0;
     // draws dots..
@@ -531,7 +531,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawLines()
+  synchronized private void drawLines()
   {
     for (Line<XT, YT> line : mLines)
     {
@@ -567,7 +567,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void drawXAxis(float bottomPadding, float leftPadding, float rightPadding, float usableWidth)
+  synchronized private void drawXAxis(float bottomPadding, float leftPadding, float rightPadding, float usableWidth)
   {
     mCanvas.drawLine(leftPadding, getHeight() - bottomPadding, getWidth() - rightPadding, getHeight() - bottomPadding, mGridPaint);
     if (mXLabels.size() > 0)
@@ -658,7 +658,7 @@ public class LineChart<XT, YT> extends View
     return value;
   }
 
-  private void drawYAxisLabels(float bottomPadding, float usableHeight)
+  synchronized private void drawYAxisLabels(float bottomPadding, float usableHeight)
   {
     float maxY = getMaxY();
     float minY = getMinY();
@@ -691,7 +691,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  private void calculatePoints(float bottomPadding, float leftPadding, float usableHeight, float usableWidth)
+  synchronized private void calculatePoints(float bottomPadding, float leftPadding, float usableHeight, float usableWidth)
   {
     mXLabels.clear();
     float maxY = getMaxY();
@@ -888,7 +888,7 @@ public class LineChart<XT, YT> extends View
   }
 
 
-  public void fillXAxisPoints(int start, int end)
+  synchronized public void fillXAxisPoints(int start, int end)
   {
     for (Line<XT, YT> line : mLines)
     {
@@ -896,7 +896,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  public void rotateToStartAt(int start)
+  synchronized public void rotateToStartAt(int start)
   {
     for (Line<XT, YT> line : mLines)
     {
@@ -904,7 +904,7 @@ public class LineChart<XT, YT> extends View
     }
   }
 
-  public void setLineShowingPoints(int position)
+  synchronized public void setLineShowingPoints(int position)
   {
     mIndexSelected = -1;
     mSelectedPressed = false;
